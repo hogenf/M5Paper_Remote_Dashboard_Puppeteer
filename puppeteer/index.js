@@ -4,15 +4,35 @@ import puppeteer from 'puppeteer';
 import { execFileSync } from 'child_process';
 import { renameSync } from 'fs';
 import cron from 'node-cron';
+import 'dotenv/config';
+import path from 'node:path';
+import sharp from 'sharp';
+const base = process.env.PWD;
 
 const URL = process.env.URL;
 const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME;
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD;
-const CRON=process.env.CRON || "*/15 * * * *";
+const CRON=process.env.CRON || "0 5,10,20,25,35,40,50,55 * * * *  ;  48 14,29,44,59 * * * *";
 const WAIT_FOR_PAGE_MS = Number(process.env.WAIT_FOR_PAGE_MS || 5000);
-const OUTPUT_DIR=process.env.OUTPUT_DIR || "/output";
+const OUTPUT_DIR= path.join(base,process.env.OUTPUT_DIR) || "/output";
 const VIEWPORT_WIDTH=Number(process.env.VIEWPORT_WIDTH || 1024);
 const VIEWPORT_HEIGHT=Number(process.env.VIEWPORT_HEIGHT || 768);
+
+
+import express from 'express'
+const app = express()
+const port = 3000
+
+//Express server
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+app.use(express.static('output'))
+
 
 if (!URL) {
  console.error("Missing URL environment variable.")
@@ -49,16 +69,16 @@ async function fetch() {
   log("Waiting for " + WAIT_FOR_PAGE_MS + "ms until page is rendered.");
   await page.waitForTimeout(WAIT_FOR_PAGE_MS);
 
-  const ss = await page.screenshot({path: "screenshot.png"});
-  log("Screenshot created.");
+  const ss = await page.screenshot({path: "output/screenshot.tmp.jpg",type: "jpeg"});
+  log("Screenshot taken.");
 
   await page.close();
 
-  execFileSync("convert", ["screenshot.png", OUTPUT_DIR + "/screenshot.tmp.jpg"]);
-  log("Converted png -> .tmp.jpg");
+  sharp('output/screenshot.tmp.jpg').grayscale().toFile('output/screenshot.jpg', (err, info) => {if(err) {log(err)} log(info) });
+  log("Screenshot created.");
 
-  renameSync(OUTPUT_DIR + "/screenshot.tmp.jpg", OUTPUT_DIR + "/screenshot.jpg"); 
-  log("Renamed .tmp.jpg to /output/screenshot.jpg");
+
+  //renameSync(OUTPUT_DIR + "/screenshot.tmp.jpg", OUTPUT_DIR + "/screenshot.
   log("---------------------------------------");
 
 }

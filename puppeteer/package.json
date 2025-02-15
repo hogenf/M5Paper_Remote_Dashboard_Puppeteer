@@ -2,17 +2,19 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
     "node-cron": "^3.0.2",
-    "puppeteer": "^19.7.5",
+    "puppeteer": "^24.2.1",
     "sharp": "^0.33.5"
   },
   "name": "puppeteer",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "npx pm2-dev start index.js"
   },
   "author": "",
   "license": "MIT",

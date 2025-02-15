@@ -17,16 +17,19 @@ const WAIT_FOR_PAGE_MS = Number(process.env.WAIT_FOR_PAGE_MS || 5000);
 const OUTPUT_DIR= path.join(base,process.env.OUTPUT_DIR) || "/output";
 const VIEWPORT_WIDTH=Number(process.env.VIEWPORT_WIDTH || 1024);
 const VIEWPORT_HEIGHT=Number(process.env.VIEWPORT_HEIGHT || 768);
+const __dirname = path.resolve();
 
-
-import express from 'express'
-const app = express()
-const port = 3000
+import express from 'express';
+const app = express();
+const port = 3000;
 
 //Express server
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+//set view engine
+app.set("view engine","ejs")
+app.set("views", path.join(__dirname, "views"));
+app.get("/", (req, res) => {
+  res.render("index",{ message: 'Hello, World!' });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
@@ -67,7 +70,7 @@ async function fetch() {
   await page.goto(URL);
 
   log("Waiting for " + WAIT_FOR_PAGE_MS + "ms until page is rendered.");
-  await page.waitForTimeout(WAIT_FOR_PAGE_MS);
+  //await page.waitForTimeout(WAIT_FOR_PAGE_MS);
 
   const ss = await page.screenshot({path: "output/screenshot.tmp.jpg",type: "jpeg"});
   log("Screenshot taken.");
